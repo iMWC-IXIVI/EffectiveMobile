@@ -14,4 +14,5 @@
 > ```docker run -p 98674:8001 --env-file .env eff_mobile_test```
 8. Запуск docker-compose - ```docker compose up --build```
 9. Просмотр файлов системы контейнера - ```docker exec -it fastapi_backend bash```
-10. 
+10. Создание миграции (Контейнер должен быть запущен) - ```docker exec -it fastapi_backend alembic revision --autogenerate -m "Название миграции"```
+> После создания миграции необходимо перезагрузить контейнер, что бы миграции накатились
