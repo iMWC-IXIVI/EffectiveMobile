@@ -1,0 +1,18 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: fastapi_backend
+    env_file: ./.env
+    volumes:
+      - ./app:/usr/src/app
+    ports:
+      - "${DOCKERCOMPOSE_LOCAL_PORT}:${DOCKERCOMPOSE_PORT}"
+    command: sh -c "uvicorn main:app --host ${DOCKERCOMPOSE_HOST} --port ${DOCKERCOMPOSE_PORT} --reload"
+    restart: unless-stopped
+    networks:
+      - dev
+
+networks:
+  dev:
