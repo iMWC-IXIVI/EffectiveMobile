@@ -4,6 +4,11 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     DATABASE_URL: str
 
+    ACCESS_TOKEN_KEY: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    ALGORITHM: str
+    REFRESH_TOKEN_EXPIRE_DAYS: int
+
     class Config:
         env_file = '.env'
 
