@@ -6,3 +6,4 @@ venv/
 ## SYSTEM FILES
 
 **/.idea
+**/__pycache__
