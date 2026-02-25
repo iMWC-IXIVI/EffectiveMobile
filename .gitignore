@@ -1,0 +1,8 @@
+## ENVIRONMENT
+
+.env
+venv/
+
+## SYSTEM FILES
+
+**/.idea
