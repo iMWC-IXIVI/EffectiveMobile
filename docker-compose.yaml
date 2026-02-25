@@ -9,10 +9,35 @@ services:
       - ./app:/usr/src/app
     ports:
       - "${DOCKERCOMPOSE_LOCAL_PORT}:${DOCKERCOMPOSE_PORT}"
-    command: sh -c "uvicorn main:app --host ${DOCKERCOMPOSE_HOST} --port ${DOCKERCOMPOSE_PORT} --reload"
+    depends_on:
+      database:
+        condition: service_healthy
+    command: sh -c "alembic upgrade head && uvicorn main:app --host ${DOCKERCOMPOSE_HOST} --port ${DOCKERCOMPOSE_PORT} --reload"
     restart: unless-stopped
     networks:
       - dev
+  database:
+    image: postgres:18-alpine
+    container_name: db_postgresql
+    volumes:
+      - pg_data:/var/lib/postgresql
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_LOCAL_PORT}:${POSTGRES_PORT}"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - dev
+
+volumes:
+  pg_data:
 
 networks:
   dev:

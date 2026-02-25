@@ -8,7 +8,7 @@ RUN pip3 install --upgrade pip && pip3 install --no-cache-dir -r ../req.txt
 
 COPY ./app .
 
-CMD ["sh", "-c", "uvicorn main:app --reload --host ${DOCKERFILE_HOST} --port ${DOCKERFILE_PORT}"]
+CMD ["sh", "-c", "alembic upgrade head && uvicorn main:app --reload --host ${DOCKERFILE_HOST} --port ${DOCKERFILE_PORT}"]
 
 
 ENV PYTHONPATH /usr/src/app
