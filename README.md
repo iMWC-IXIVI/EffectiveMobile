@@ -12,3 +12,6 @@
 > правый, тот который указан внутри файла .env в переменной окружения DOCKERFILE_PORT.
 > Если DOCKERFILE_PORT=8001 и вам нужно запустить образ на локальной машине на порту 98674, то команда будет следующая
 > ```docker run -p 98674:8001 --env-file .env eff_mobile_test```
+8. Запуск docker-compose - ```docker compose up --build```
+9. Просмотр файлов системы контейнера - ```docker exec -it fastapi_backend bash```
+10. 
