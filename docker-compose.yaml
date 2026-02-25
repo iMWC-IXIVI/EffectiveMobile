@@ -12,7 +12,7 @@ services:
     depends_on:
       database:
         condition: service_healthy
-    command: sh -c "uvicorn main:app --host ${DOCKERCOMPOSE_HOST} --port ${DOCKERCOMPOSE_PORT} --reload"
+    command: sh -c "alembic upgrade head && uvicorn main:app --host ${DOCKERCOMPOSE_HOST} --port ${DOCKERCOMPOSE_PORT} --reload"
     restart: unless-stopped
     networks:
       - dev
