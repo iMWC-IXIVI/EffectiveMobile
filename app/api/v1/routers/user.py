@@ -109,6 +109,16 @@ async def logout():
     return response
 
 
-@user_router.get('/detail')
+@user_router.get('/detail', summary='Детальная информация', status_code=status.HTTP_202_ACCEPTED)
 async def get_detail(current_user: User = Depends(get_user)) -> UserSchema:
     return current_user
+
+
+@user_router.delete('/delete', summary='Удаление', status_code=status.HTTP_200_OK)
+async def delete_user(current_user: User = Depends(get_user), connection: AsyncSession = Depends(get_db)):
+    current_user.is_deleted = True
+
+    await connection.commit()
+    await connection.refresh(current_user)
+
+    return {'message': 'success'}
