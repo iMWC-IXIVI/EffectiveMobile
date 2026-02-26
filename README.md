@@ -37,8 +37,8 @@
 > Если DOCKERFILE_PORT=8001 и вам нужно запустить образ на локальной машине на порту 98674, то команда будет следующая
 > ```docker run -p 98674:8001 --env-file .env eff_mobile_test```
 12. Запуск docker-compose - ```docker compose up --build```
-13. Просмотр файлов системы контейнера - ```docker exec -it fastapi_backend bash```
-14. Создание миграции (Контейнер должен быть запущен) - ```docker exec -it fastapi_backend alembic revision --autogenerate -m "Название миграции"```
+13. Просмотр файлов системы контейнера (опционально) - ```docker exec -it fastapi_backend bash```
+14. Создание миграции (Контейнер должен быть запущен) (опционально) - ```docker exec -it fastapi_backend alembic revision --autogenerate -m "Название миграции"```
 > После создания миграции необходимо перезагрузить контейнер, что бы миграции накатились
 
 ---
