@@ -1,1 +1,1 @@
-from .routers import test_router
+from .routers import test_router, user_router
