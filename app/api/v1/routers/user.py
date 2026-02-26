@@ -44,6 +44,8 @@ async def registration(data: UserRegistration, connection: AsyncSession = Depend
 
     await connection.refresh(user)
 
+    print('~~~~~~~~~~~~ID~~~~~~~~~~~~', user.id, '~~~~~~~~~~~~ID~~~~~~~~~~~~', sep='\n')
+
     return Success()
 
 
