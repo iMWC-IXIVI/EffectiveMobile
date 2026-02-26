@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Depends, exceptions
+from fastapi import APIRouter, status, Depends, exceptions, responses
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -63,4 +63,16 @@ async def login(data: UserLogin, connection: AsyncSession = Depends(get_db)):
     access_token = create_access_token(encode_data)
     refresh_token = create_refresh_token(encode_data)
 
-    return JWTTokens(access_token=access_token, refresh_token=refresh_token)
+    print(refresh_token)  # TODO можно будет удалить, для дальнейших тестов понадобится
+
+    response = responses.JSONResponse(content={'access_token': access_token})
+
+    response.set_cookie(
+        key='refresh_token',
+        value=refresh_token,
+        httponly=True,
+        secure=True,
+        path='/refresh'
+    )
+
+    return response
