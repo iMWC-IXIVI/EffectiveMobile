@@ -25,3 +25,8 @@ class User(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class UserUpdate(BaseModel):
+    email: str
+    last_name: str

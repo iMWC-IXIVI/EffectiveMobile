@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from db import get_db
-from db.shemas import UserRegistration, Success, UserLogin, User as UserSchema
+from db.shemas import UserRegistration, Success, UserLogin, User as UserSchema, UserUpdate
 from db.models import User
 from core import hash_password, verify_password, create_access_token, create_refresh_token, settings
 from utils import get_user
@@ -117,6 +117,22 @@ async def get_detail(current_user: User = Depends(get_user)) -> UserSchema:
 @user_router.delete('/delete', summary='Удаление', status_code=status.HTTP_200_OK)
 async def delete_user(current_user: User = Depends(get_user), connection: AsyncSession = Depends(get_db)):
     current_user.is_deleted = True
+
+    await connection.commit()
+    await connection.refresh(current_user)
+
+    return {'message': 'success'}
+
+
+@user_router.patch('/detail/update', summary='Изменение профиля', status_code=status.HTTP_202_ACCEPTED)
+async def user_update(data: UserUpdate, current_user: User = Depends(get_user), connection: AsyncSession = Depends(get_db)):
+    data = data.model_dump(exclude_unset=True)
+
+    if not data:
+        raise exceptions.HTTPException(detail='Error', status_code=status.HTTP_400_BAD_REQUEST)
+
+    for field, value in data.items():
+        setattr(current_user, field, value)
 
     await connection.commit()
     await connection.refresh(current_user)
