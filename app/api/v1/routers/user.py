@@ -8,8 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from db import get_db
-from db.shemas import UserRegistration, Success, UserLogin, User as UserSchema, UserUpdate
-from db.models import User
+from db.shemas import UserRegistration, Success, UserLogin, User as UserSchema, UserUpdate, UserID
+from db.models import User, UserRole
 from core import hash_password, verify_password, create_access_token, create_refresh_token, settings
 from utils import get_user, get_admin
 
@@ -150,3 +150,20 @@ async def show_all_users(admin: User = Depends(get_admin), connection: AsyncSess
     users = db_data.scalars().all()
 
     return users
+
+
+@user_router.patch('/admin/user-up', summary='Повышение пользователя до админа', status_code=status.HTTP_200_OK)
+async def user_up(user_id: UserID, admin: User = Depends(get_admin), connection: AsyncSession = Depends(get_db)):
+    query = select(User).where(User.id == user_id.user_id)
+    db_data = await connection.execute(query)
+    user = db_data.scalar_one_or_none()
+
+    if not user:
+        raise exceptions.HTTPException(detail='Error', status_code=status.HTTP_400_BAD_REQUEST)
+
+    user.role = UserRole.admin
+
+    await connection.commit()
+    await connection.refresh(user)
+
+    return {'message': 'success'}

@@ -30,3 +30,7 @@ class User(BaseModel):
 class UserUpdate(BaseModel):
     email: str
     last_name: str
+
+
+class UserID(BaseModel):
+    user_id: str
