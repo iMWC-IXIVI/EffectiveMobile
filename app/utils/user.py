@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from core import settings
-from db.models import User
+from db.models import User, UserRole
 from db import get_db
 
 
@@ -35,3 +35,9 @@ async def get_user(cred: HTTPAuthorizationCredentials = Depends(security), conne
         raise exceptions.HTTPException(detail='Error', status_code=status.HTTP_400_BAD_REQUEST)
 
     return user
+
+
+async def get_admin(current_user: User = Depends(get_user), connection: AsyncSession = Depends(get_db)):
+    if current_user.role != UserRole.admin:
+        raise exceptions.HTTPException(detail='Error', status_code=status.HTTP_403_FORBIDDEN)
+    return current_user

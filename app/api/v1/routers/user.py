@@ -1,5 +1,7 @@
 import jwt
 
+from typing import Sequence
+
 from fastapi import APIRouter, status, Depends, exceptions, responses, Request
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,7 +11,7 @@ from db import get_db
 from db.shemas import UserRegistration, Success, UserLogin, User as UserSchema, UserUpdate
 from db.models import User
 from core import hash_password, verify_password, create_access_token, create_refresh_token, settings
-from utils import get_user
+from utils import get_user, get_admin
 
 
 user_router = APIRouter(prefix='/user', tags=['Пользователь', ])
@@ -138,3 +140,13 @@ async def user_update(data: UserUpdate, current_user: User = Depends(get_user), 
     await connection.refresh(current_user)
 
     return {'message': 'success'}
+
+
+@user_router.get('/admin/show-all', summary='Получение списка всех пользователей', status_code=status.HTTP_200_OK)
+async def show_all_users(admin: User = Depends(get_admin), connection: AsyncSession = Depends(get_db)) -> Sequence[UserSchema]:
+
+    query = select(User)
+    db_data = await connection.execute(query)
+    users = db_data.scalars().all()
+
+    return users
