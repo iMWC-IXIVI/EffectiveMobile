@@ -1,4 +1,6 @@
-from fastapi import APIRouter, status, Depends, exceptions, responses
+import jwt
+
+from fastapi import APIRouter, status, Depends, exceptions, responses, Request
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -6,7 +8,7 @@ from sqlalchemy.future import select
 from db import get_db
 from db.shemas import UserRegistration, Success, UserLogin, JWTTokens
 from db.models import User
-from core import hash_password, verify_password, create_access_token, create_refresh_token
+from core import hash_password, verify_password, create_access_token, create_refresh_token, settings
 
 
 user_router = APIRouter(prefix='/user', tags=['Пользователь', ])
@@ -71,8 +73,36 @@ async def login(data: UserLogin, connection: AsyncSession = Depends(get_db)):
         key='refresh_token',
         value=refresh_token,
         httponly=True,
-        secure=True,
-        path='/refresh'
+        secure=False,  # TODO True на проде
+        path='/user/refresh'
     )
 
+    return response
+
+
+@user_router.post('/refresh', summary='Обновление access токена', status_code=status.HTTP_202_ACCEPTED)
+async def refresh(request: Request):
+    refresh_token = request.cookies.get('refresh_token')
+
+    if not refresh_token:
+        raise exceptions.HTTPException(detail='Error', status_code=status.HTTP_401_UNAUTHORIZED)
+
+    try:
+        payload = jwt.decode(refresh_token, settings.ACCESS_TOKEN_KEY, settings.ALGORITHM)
+    except Exception:
+        raise exceptions.HTTPException(detail='Error', status_code=status.HTTP_401_UNAUTHORIZED)
+
+    if payload.get('type') != 'refresh':
+        raise exceptions.HTTPException(detail='Error', status_code=status.HTTP_401_UNAUTHORIZED)
+
+    encode_data = {'sub': payload['sub']}
+    new_access = create_access_token(encode_data)
+
+    return {'message': f'{new_access}'}
+
+
+@user_router.post('/logout', summary='Выход из системы', status_code=status.HTTP_200_OK)
+async def logout():
+    response = responses.Response(status_code=204)
+    response.delete_cookie('refresh_token', path='/user/refresh')
     return response
