@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, UUID4
 
 
 class UserRegistration(BaseModel):
@@ -13,3 +13,15 @@ class UserRegistration(BaseModel):
 class UserLogin(BaseModel):
     email: str
     password: str
+
+
+class User(BaseModel):
+    id: UUID4
+    first_name: str
+    last_name: str
+    surname: str
+    email: str
+    role: str
+
+    class Config:
+        from_attributes = True

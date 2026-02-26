@@ -6,9 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from db import get_db
-from db.shemas import UserRegistration, Success, UserLogin, JWTTokens
+from db.shemas import UserRegistration, Success, UserLogin, User as UserSchema
 from db.models import User
 from core import hash_password, verify_password, create_access_token, create_refresh_token, settings
+from utils import get_user
 
 
 user_router = APIRouter(prefix='/user', tags=['Пользователь', ])
@@ -106,3 +107,8 @@ async def logout():
     response = responses.Response(status_code=204)
     response.delete_cookie('refresh_token', path='/user/refresh')
     return response
+
+
+@user_router.get('/detail')
+async def get_detail(current_user: User = Depends(get_user)) -> UserSchema:
+    return current_user
